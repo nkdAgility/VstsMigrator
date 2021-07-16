@@ -194,6 +194,8 @@ namespace MigrationTools.Processors
             var targetDefinitions = await Target.GetApiDefinitionsAsync<BuildDefinition>();
             var sourceServiceConnections = await Source.GetApiDefinitionsAsync<ServiceConnection>();
             var targetServiceConnections = await Target.GetApiDefinitionsAsync<ServiceConnection>();
+            var sourceRepositories = await Source.GetApiDefinitionsAsync<GitRepository>();
+            var targetRepositories = await Target.GetApiDefinitionsAsync<GitRepository>();
             var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
 
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
@@ -204,6 +206,11 @@ namespace MigrationTools.Processors
                 var targetConnectedServiceId = targetServiceConnections.FirstOrDefault(s => sourceServiceConnections
                     .FirstOrDefault(c => c.Id == sourceConnectedServiceId)?.Name == s.Name)?.Id;
                 definitionToBeMigrated.Repository.Properties.ConnectedServiceId = targetConnectedServiceId;
+
+                var sourceRepoId = definitionToBeMigrated.Repository.Id;
+                var targetRepoId = targetRepositories.FirstOrDefault(r => sourceRepositories
+                    .FirstOrDefault(s => s.Id == sourceRepoId)?.Name == r.Name)?.Id;
+                definitionToBeMigrated.Repository.Id = targetRepoId;
 
                 if (TaskGroupMapping is not null)
                 {
