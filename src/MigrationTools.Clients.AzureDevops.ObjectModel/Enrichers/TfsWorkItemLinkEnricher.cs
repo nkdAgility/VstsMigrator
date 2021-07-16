@@ -49,6 +49,7 @@ namespace MigrationTools.Enrichers
 
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
+                Log.LogDebug("Links = '{@sourceWorkItemLinkStartLinks}", sourceWorkItemLinkStart.Links);
                 foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
                 {
                     try
@@ -195,9 +196,9 @@ namespace MigrationTools.Enrichers
             WorkItemData wiSourceR = null;
             WorkItemData wiTargetR = null;
 
-            Log.LogDebug("RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' on WorkItemId s:{ids} t:{idt}", rl.ArtifactLinkType.Name, wiSourceL.Id, wiTargetL.Id);
+            Log.LogDebug("RelatedLink is of ArtifactLinkType='{ArtifactLinkType}':LinkTypeEnd='{LinkTypeEndImmutableName}' on WorkItemId s:{ids} t:{idt}", rl.ArtifactLinkType.Name, rl.LinkTypeEnd == null? "null" : rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
 
-            if (rl.ArtifactLinkType.Name.Contains("Related")) // On a registered link type these will for sure fail as target is not in the system.
+            if (rl.LinkTypeEnd != null) // On a registered link type these will for sure fail as target is not in the system.
             {
                 try
                 {

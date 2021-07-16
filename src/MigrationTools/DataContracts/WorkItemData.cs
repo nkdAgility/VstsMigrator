@@ -30,6 +30,7 @@ namespace MigrationTools.DataContracts
         public SortedDictionary<int, RevisionItem> Revisions { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }
+        public List<LinkItem> Links { get; set; }
 
         //private object GetField(string field)
         //{

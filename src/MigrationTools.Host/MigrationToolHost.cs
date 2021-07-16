@@ -45,7 +45,7 @@ namespace MigrationTools.Host
                      .Enrich.FromLogContext()
                      .Enrich.WithMachineName()
                      .Enrich.WithProcessId()
-                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code)
+                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate:"[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
                      .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error)
                      .WriteTo.File(logPath, LogEventLevel.Verbose);
              })

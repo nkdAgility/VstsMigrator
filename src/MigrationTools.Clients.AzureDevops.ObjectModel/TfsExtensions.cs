@@ -94,6 +94,53 @@ namespace MigrationTools
                                                                                                         Type = x.Fields["System.WorkItemType"].Value as string,
                                                                                                         Fields = x.Fields.AsDictionary()
                                                                                                     }).ToDictionary(r => r.Number, r => r)) : null;
+            context.Links = GetLinkData(workItem);
+        }
+
+        private static List<LinkItem> GetLinkData(WorkItem workItem)
+        {
+            var ls = new List<LinkItem>();
+
+            foreach (Link l in workItem.Links)
+            {
+                if (l is Hyperlink)
+                {
+                    var lh = (Hyperlink)l;
+                    ls.Add(new LinkItem() {
+                        LinkType = LinkItemType.Hyperlink,
+                        ArtifactLinkType = l.ArtifactLinkType.Name,
+                        Comment = lh.Comment, 
+                        LinkUri = lh.Location
+                    });
+                }
+                else if (l is ExternalLink)
+                {
+                    var le = (ExternalLink)l;
+                    ls.Add(new LinkItem() {
+                        LinkType = LinkItemType.ExternalLink,
+                        ArtifactLinkType = l.ArtifactLinkType.Name,
+                        Comment = le.Comment,
+                        LinkUri = le.LinkedArtifactUri
+                    });
+                }
+                else if (l is RelatedLink)
+                {
+                    var lr = (RelatedLink)l;
+                    ls.Add(new LinkItem()
+                    {
+                        LinkType = LinkItemType.RelatedLink,
+                        ArtifactLinkType = l.ArtifactLinkType.Name,
+                        Comment = lr.Comment,
+                        RelatedWorkItem = lr.RelatedWorkItemId,
+                        LinkTypeEndImmutableName = lr.LinkTypeEnd==null? "": lr.LinkTypeEnd.ImmutableName,
+                        LinkTypeEndName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.Name,
+                    });
+                } else
+                {
+                    Log.Debug("TfsExtensions::GetLinkData: RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' and Type '{GetTypeName}' on WorkItemId: {WorkItemId}", l.ArtifactLinkType.Name, l.GetType().Name , workItem.Id);
+                }
+            }
+            return ls;
         }
 
         public static void SaveToAzureDevOps(this WorkItemData context)
